@@ -1,5 +1,7 @@
 package somedata
 
+// source code realization: https://github.com/komkom/ring
+
 import (
 	"fmt"
 )
@@ -13,6 +15,7 @@ type byteRing struct {
 	headPos  int64
 }
 
+// NewByteRing - creates io.ReadWriter byte buffer for stream usage
 func NewByteRing(size int) *byteRing {
 	return &byteRing{
 		buffer: make([]byte, size),

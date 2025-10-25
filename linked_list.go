@@ -30,11 +30,13 @@ func (v *LinkedList[T]) nilPanic() {
 	}
 }
 
+// Size - linked list size
 func (v *LinkedList[T]) Size() int {
 	v.nilPanic()
 	return v.size
 }
 
+// Head - linked list header element
 func (v *LinkedList[T]) Head() (head T, ok bool) {
 	v.nilPanic()
 
@@ -45,6 +47,7 @@ func (v *LinkedList[T]) Head() (head T, ok bool) {
 	return v.entry.value, true
 }
 
+// Tail - linked list tail element
 func (v *LinkedList[T]) Tail() (tail T, ok bool) {
 	v.nilPanic()
 
@@ -64,6 +67,7 @@ func (v *LinkedList[T]) Tail() (tail T, ok bool) {
 	}
 }
 
+// Add - push element to list
 func (v *LinkedList[T]) Add(value T) {
 	v.nilPanic()
 
@@ -85,6 +89,7 @@ func (v *LinkedList[T]) Add(value T) {
 	}
 }
 
+// Clear - fully clears linked list data
 func (v *LinkedList[T]) Clear() {
 	v.nilPanic()
 	v.size = 0
@@ -110,6 +115,7 @@ func (v *LinkedList[T]) Clear() {
 	v.entry = nil
 }
 
+// Pop - pops element from list
 func (v *LinkedList[T]) Pop() (head T, ok bool) {
 	v.nilPanic()
 
@@ -127,6 +133,7 @@ func (v *LinkedList[T]) Pop() (head T, ok bool) {
 	return head, true
 }
 
+// Slice - get type Slice with elements
 func (v *LinkedList[T]) Slice() []T {
 	v.nilPanic()
 

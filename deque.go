@@ -1,5 +1,7 @@
 package somedata
 
+// source code realization: https://github.com/gammazero/deque
+
 import (
 	"fmt"
 	"iter"
@@ -15,6 +17,7 @@ type deque[T any] struct {
 	minCap int
 }
 
+// NewDeque - creates double-ended queue data structure
 func NewDeque[T any]() *deque[T] {
 	return &deque[T]{}
 }

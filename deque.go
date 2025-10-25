@@ -1,5 +1,7 @@
 package somedata
 
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2018 Andrew J. Gillis
 // source code realization: https://github.com/gammazero/deque
 
 import (

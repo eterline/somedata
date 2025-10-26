@@ -1,32 +1,46 @@
 package somedata
 
 import (
-	"cmp"
-	"slices"
+	"fmt"
 
 	"golang.org/x/exp/constraints"
 )
+
+func ErrUnequalMat(s string) error {
+	return fmt.Errorf("%s: not equal matrix shapes", s)
+}
 
 type Numeric interface {
 	constraints.Integer | constraints.Float
 }
 
-type Matrix[T cmp.Ordered] interface {
-	Rank() int    // Matrix xD fomation
-	Shape() []int // Matrix sizes from start to end
-	Size() int    // Fullly elements count
+type Matrix[T Numeric] interface {
+	// Rank - matrix xD fomation
+	Rank() int
+	// Shape - matrix sizes from start to end
+	Shape() []int
+	// Size - fulll elements count
+	Size() int
+	// ShapeEquals - compares two matrix sizes
+	ShapeEquals(m Matrix[T]) bool
 
-	Get(coords ...int) T        // Get element by Coordinates
-	Set(value T, coords ...int) // Set element by Coordinates
+	// Get - element by coordinates
+	Get(coords ...int) T
+	// Set - element by coordinates
+	Set(value T, coords ...int)
 
-	Flatten() []T        // Give flatten slice
-	Scale(k T) Matrix[T] // Multipile on scalar value
+	// Flatten - give flatten slice
+	Flatten() []T
+	// Scale - multipile on scalar value
+	Scale(k T) Matrix[T]
 
-	// Add(m Matrix[T]) (Matrix[T], error)
-	// Sub(m Matrix[T]) (Matrix[T], error)
-	// Mul(m Matrix[T]) (Matrix[T], error) // Элементное умножение (Hadamard)
+	Add(m Matrix[T]) (Matrix[T], error)
+	Sub(m Matrix[T]) (Matrix[T], error)
+	MulHadamard(m Matrix[T]) (Matrix[T], error)
 
+	// Equals - compares two matrix by sizes and values
 	Equals(m Matrix[T]) bool
+	// Zero - set all matrix values by default value in type
 	Zero()
 }
 
@@ -55,115 +69,4 @@ func idx2Coords(shape []int, index int) []int {
 		index /= shape[i]
 	}
 	return coords
-}
-
-// ==============================
-
-// matrix2 - default 2D matrix
-type matrix2[T Numeric] struct {
-	width  int
-	height int
-	arr    []T // flat data store
-}
-
-func NewMatrix2[T Numeric](width, height int) Matrix[T] {
-	return &matrix2[T]{
-		width:  width,
-		height: height,
-		arr:    make([]T, width*height),
-	}
-}
-
-func (mt *matrix2[T]) nilPanic() {
-	if mt == nil || mt.arr == nil {
-		panic("2D matrix: is nil pointer")
-	}
-}
-
-func (mt *matrix2[T]) coords2idx(w, h int) int {
-	if w == 0 {
-		w = 1
-	}
-	if h == 0 {
-		h = 1
-	}
-	return (w - 1) + (h-1)*w
-}
-
-func (mt *matrix2[T]) Rank() int {
-	return 2
-}
-
-func (mt *matrix2[T]) Shape() []int {
-	mt.nilPanic()
-	return []int{mt.width, mt.height}
-}
-
-func (mt *matrix2[T]) Size() int {
-	mt.nilPanic()
-	return len(mt.arr)
-}
-
-func (mt *matrix2[T]) Get(coords ...int) T {
-	mt.nilPanic()
-
-	if len(coords) > mt.Rank() {
-		panic("2D matrix: dimension coordinates mismatch")
-	}
-
-	idx := mt.coords2idx(coords[0], coords[1])
-	return mt.arr[idx]
-}
-
-func (mt *matrix2[T]) Set(value T, coords ...int) {
-	mt.nilPanic()
-
-	if len(coords) > mt.Rank() {
-		panic("2D matrix: dimension coordinates mismatch")
-	}
-
-	idx := mt.coords2idx(coords[0], coords[1])
-	mt.arr[idx] = value
-}
-
-func (mt *matrix2[T]) Flatten() []T {
-	mt.nilPanic()
-	return mt.arr
-}
-
-func (mt *matrix2[T]) clone() *matrix2[T] {
-	mt.nilPanic()
-
-	new := &matrix2[T]{
-		width:  mt.width,
-		height: mt.height,
-		arr:    make([]T, mt.width*mt.height),
-	}
-
-	copy(new.arr, mt.arr)
-	return new
-}
-
-func (mt *matrix2[T]) Clone() Matrix[T] {
-	return mt.clone()
-}
-
-func (mt *matrix2[T]) Scale(k T) Matrix[T] {
-	cloned := mt.clone()
-	for i := range mt.arr {
-		cloned.arr[i] *= k
-	}
-	return cloned
-}
-
-func (mt *matrix2[T]) Equals(m Matrix[T]) bool {
-	flt := m.Flatten()
-	return slices.Equal(mt.arr, flt)
-}
-
-func (mt *matrix2[T]) Zero() {
-	var dflt T
-	for i := range mt.arr {
-		mt.arr[i] = dflt
-	}
 }

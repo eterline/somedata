@@ -14,6 +14,8 @@ type RingBuffer[T comparable] interface {
 	Add(value T)
 	// Get - return element by index (0 - the oldest)
 	Get(index int) (T, bool)
+	// Pop - get header item and delete it from buffer
+	Pop() (T, bool)
 	// Len - number of element in buffer
 	Len() int
 	// Cap - buffer capability
@@ -70,6 +72,20 @@ func (rb *slicesRingBuffer[T]) Get(index int) (T, bool) {
 
 	idx := (rb.head + index) % rb.size
 	return rb.data[idx], true
+}
+
+// Pop - get header item and delete it from buffer
+func (rb *slicesRingBuffer[T]) Pop() (T, bool) {
+	if rb.count == 0 {
+		var zero T
+		return zero, false
+	}
+
+	tail := (rb.head - rb.count + rb.size) % rb.size
+	val := rb.data[tail]
+	rb.count--
+
+	return val, true
 }
 
 // Len - number of element in buffer
@@ -158,6 +174,13 @@ func (rb *syncSlicesRingBuffer[T]) Get(index int) (T, bool) {
 	rb.RLock()
 	defer rb.RUnlock()
 	return rb.buff.Get(index)
+}
+
+// Pop - get header item and delete it from buffer
+func (rb *syncSlicesRingBuffer[T]) Pop() (T, bool) {
+	rb.Lock()
+	defer rb.Unlock()
+	return rb.buff.Pop()
 }
 
 // Len - number of element in buffer

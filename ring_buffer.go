@@ -2,6 +2,12 @@ package somedata
 
 import "sync"
 
+/*
+RingBuffer - fixed-size data structure that uses a
+continuous array as a circular queue. When the end of the buffer is reached,
+new elements overwrite the oldest ones. Provides O(1) enqueue and dequeue
+operations with constant memory usage.
+*/
 type RingBuffer[T comparable] interface {
 	// Add - add element to buffer.
 	// If fully - rewrites oldest
@@ -119,7 +125,7 @@ func (rb *slicesRingBuffer[T]) Contains(value T) bool {
 	return false
 }
 
-// sontains sync mutex
+// with sync mutex
 type syncSlicesRingBuffer[T comparable] struct {
 	buff slicesRingBuffer[T] // internal buffer
 	sync.RWMutex
@@ -189,7 +195,7 @@ func (rb *syncSlicesRingBuffer[T]) Slice() []T {
 	return rb.buff.Slice()
 }
 
-// Contains - containment status
+// Contains - check value existing in buffer
 func (rb *syncSlicesRingBuffer[T]) Contains(value T) bool {
 	rb.RLock()
 	defer rb.RUnlock()

@@ -11,6 +11,11 @@ import (
 
 const dequeMinCapacity = 15
 
+/*
+deque - dynamic data structure that allows insertion
+and removal of elements from both ends in O(1) time. It can function as both
+a queue (FIFO) and a stack (LIFO), depending on how elements are accessed.
+*/
 type deque[T any] struct {
 	buf    []T
 	head   int

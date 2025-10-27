@@ -34,14 +34,14 @@ type Matrix[T Numeric] interface {
 	// Scale - multipile on scalar value
 	Scale(k T) Matrix[T]
 
-	Add(m Matrix[T]) (Matrix[T], error)
-	Sub(m Matrix[T]) (Matrix[T], error)
-	MulHadamard(m Matrix[T]) (Matrix[T], error)
-
 	// Equals - compares two matrix by sizes and values
 	Equals(m Matrix[T]) bool
 	// Zero - set all matrix values by default value in type
 	Zero()
+
+	Add(m Matrix[T]) (Matrix[T], error)
+	Sub(m Matrix[T]) (Matrix[T], error)
+	MulHadamard(m Matrix[T]) (Matrix[T], error)
 }
 
 func coords2Idx(shape, coords []int) int {
@@ -69,4 +69,21 @@ func idx2Coords(shape []int, index int) []int {
 		index /= shape[i]
 	}
 	return coords
+}
+
+func shapeEq[T Numeric](a, b Matrix[T]) bool {
+	aShape := a.Shape()
+	bShape := b.Shape()
+
+	if len(aShape) != len(bShape) {
+		return false
+	}
+
+	for i := 0; i < len(aShape); i++ {
+		if aShape[i] != bShape[i] {
+			return false
+		}
+	}
+
+	return true
 }

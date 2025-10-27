@@ -19,6 +19,10 @@ type matrix2[T Numeric] struct {
 
 // NewMatrix2 - creates new 2D matrix
 func NewMatrix2[T Numeric](width, height int) Matrix[T] {
+	if width < 1 || height < 1 {
+		panic("2D matrix: width and height must be positive and non zero")
+	}
+
 	return &matrix2[T]{
 		width:  width,
 		height: height,
@@ -26,20 +30,12 @@ func NewMatrix2[T Numeric](width, height int) Matrix[T] {
 	}
 }
 
-func (mt *matrix2[T]) nilPanic() {
-	if mt == nil || mt.arr == nil {
-		panic("2D matrix: is nil pointer")
-	}
-}
-
-func (mt *matrix2[T]) testCoords(w, h int) {
+// index=y⋅width+x
+func (mt *matrix2[T]) coords2idx(w, h int) int {
 	if w >= mt.width || h >= mt.height {
 		panic("2D matrix: coords out of matrix range")
 	}
-}
 
-// index=y⋅width+x
-func (mt *matrix2[T]) coords2idx(w, h int) int {
 	return w*mt.width + h
 }
 
@@ -48,67 +44,41 @@ func (mt *matrix2[T]) Rank() int {
 }
 
 func (mt *matrix2[T]) Shape() []int {
-	mt.nilPanic()
 	return []int{mt.width, mt.height}
 }
 
 func (mt *matrix2[T]) Size() int {
-	mt.nilPanic()
 	return len(mt.arr)
 }
 
 func (mt *matrix2[T]) ShapeEquals(m Matrix[T]) bool {
-	shape0 := mt.Shape()
-	shape1 := m.Shape()
-
-	if len(shape0) != len(shape1) {
-		return false
-	}
-
-	for i := range shape0 {
-		if shape0[i] != shape1[i] {
-			return false
-		}
-	}
-
-	return true
+	return shapeEq(mt, m)
 }
 
 func (mt *matrix2[T]) Get(coords ...int) T {
-	mt.nilPanic()
-
 	if len(coords) != mt.Rank() {
 		panic("2D matrix: dimension coordinates mismatch")
 	}
-
-	mt.testCoords(coords[0], coords[1])
 
 	idx := mt.coords2idx(coords[0], coords[1])
 	return mt.arr[idx]
 }
 
 func (mt *matrix2[T]) Set(value T, coords ...int) {
-	mt.nilPanic()
-
 	if len(coords) != mt.Rank() {
 		panic("2D matrix: dimension coordinates mismatch")
 	}
-
-	mt.testCoords(coords[0], coords[1])
 
 	idx := mt.coords2idx(coords[0], coords[1])
 	mt.arr[idx] = value
 }
 
 func (mt *matrix2[T]) Flatten() []T {
-	mt.nilPanic()
 	return mt.arr
 }
 
 // clone - create new matrix with the same data values and sizes
 func (mt *matrix2[T]) clone() *matrix2[T] {
-	mt.nilPanic()
-
 	new := &matrix2[T]{
 		width:  mt.width,
 		height: mt.height,

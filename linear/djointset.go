@@ -1,6 +1,6 @@
 package somedata
 
-type DisjointNumeric interface {
+type disjointNumeric interface {
 	~int | ~int32 | ~int64 | ~uint | ~uint32 | ~uint64
 }
 
@@ -12,7 +12,7 @@ type DisjointSet[T comparable] interface {
 
 // =======================
 
-type arrDisjointSet[T DisjointNumeric] struct {
+type arrDisjointSet[T disjointNumeric] struct {
 	parent []T
 	rank   []T
 }
@@ -61,7 +61,7 @@ func (ds *mapDisjointSet[T]) MakeSet(x T) {
 
 func (ds *mapDisjointSet[T]) Find(x T) T {
 	if ds.parent[x] != x {
-		ds.parent[x] = ds.Find(ds.parent[x]) // path compression
+		ds.parent[x] = ds.Find(ds.parent[x])
 	}
 	return ds.parent[x]
 }

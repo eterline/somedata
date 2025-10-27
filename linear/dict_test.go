@@ -3,7 +3,7 @@ package somedata_test
 import (
 	"testing"
 
-	"github.com/eterline/somedata"
+	somedata "github.com/eterline/somedata/linear"
 )
 
 func TestDict_SetExistsDelete(t *testing.T) {

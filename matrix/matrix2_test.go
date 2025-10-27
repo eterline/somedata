@@ -3,7 +3,7 @@ package somedata_test
 import (
 	"testing"
 
-	"github.com/eterline/somedata"
+	somedata "github.com/eterline/somedata/matrix"
 )
 
 func newTestMatrix2x2() (somedata.Matrix[int], somedata.Matrix[int]) {

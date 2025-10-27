@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/bmizerany/assert"
-	"github.com/eterline/somedata"
+	somedata "github.com/eterline/somedata/ring_buffer"
 	"github.com/stretchr/testify/require"
 )
 

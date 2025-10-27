@@ -15,34 +15,24 @@ func NewDict[T comparable]() *dict[T] {
 	}
 }
 
-func (v *dict[T]) nilPanic() {
-	if v == nil || v.data == nil {
-		panic("dict: is nil pointer")
-	}
-}
-
 // Set - add element to dict
 func (v *dict[T]) Set(value T) {
-	v.nilPanic()
 	v.data[value] = struct{}{}
 }
 
 // Delete - delete element from dict
 func (v *dict[T]) Delete(value T) {
-	v.nilPanic()
 	delete(v.data, value)
 }
 
 // Exists - check value existing in dict
 func (v *dict[T]) Exists(value T) bool {
-	v.nilPanic()
 	_, ok := v.data[value]
 	return ok
 }
 
 // Intersects - returns intersection slice within two vocabularies
 func (v *dict[T]) Intersects(voc *dict[T]) (intersected []T, ok bool) {
-	v.nilPanic()
 	slc := make([]T, 0)
 
 	for value := range v.data {
@@ -60,7 +50,6 @@ func (v *dict[T]) Intersects(voc *dict[T]) (intersected []T, ok bool) {
 
 // Slice - voc as a Slice
 func (v *dict[T]) Slice() []T {
-	v.nilPanic()
 	slc := make([]T, 0, len(v.data))
 	for value := range v.data {
 		slc = append(slc, value)
@@ -70,13 +59,11 @@ func (v *dict[T]) Slice() []T {
 
 // Size - dict elements count
 func (v *dict[T]) Size() int {
-	v.nilPanic()
 	return len(v.data)
 }
 
 // Clear - fully clears all elements
 func (v *dict[T]) Clear() {
-	v.nilPanic()
 	for value := range v.data {
 		delete(v.data, value)
 	}

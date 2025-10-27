@@ -1,6 +1,9 @@
 package somedata
 
-import "slices"
+import (
+	"slices"
+	"unsafe"
+)
 
 /*
 matrix2 - default 2D matrix
@@ -95,7 +98,12 @@ func (mt *matrix2[T]) Clone() Matrix[T] {
 
 func (mt *matrix2[T]) Scale(k T) Matrix[T] {
 	cloned := mt.clone()
-	for i := range mt.arr {
+	n := len(mt.arr)
+
+	for i := 0; i < n; i++ {
+		if i+8 < n {
+			prefetch(unsafe.Pointer(&mt.arr[i+8]))
+		}
 		cloned.arr[i] *= k
 	}
 	return cloned
@@ -118,10 +126,16 @@ func (mt *matrix2[T]) Add(m Matrix[T]) (Matrix[T], error) {
 		return nil, ErrUnequalMat("2D matrix")
 	}
 
-	newMt := mt.clone()
-	addMt := m.Flatten()
+	var (
+		newMt = mt.clone()
+		addMt = m.Flatten()
+		n     = len(mt.arr)
+	)
 
-	for i := range newMt.arr {
+	for i := 0; i < n; i++ {
+		if i+8 < n {
+			prefetch(unsafe.Pointer(&mt.arr[i+8]))
+		}
 		newMt.arr[i] += addMt[i]
 	}
 
@@ -133,10 +147,16 @@ func (mt *matrix2[T]) Sub(m Matrix[T]) (Matrix[T], error) {
 		return nil, ErrUnequalMat("2D matrix")
 	}
 
-	newMt := mt.clone()
-	mFlat := m.Flatten()
+	var (
+		newMt = mt.clone()
+		mFlat = m.Flatten()
+		n     = len(mt.arr)
+	)
 
-	for i := range newMt.arr {
+	for i := 0; i < n; i++ {
+		if i+8 < n {
+			prefetch(unsafe.Pointer(&mt.arr[i+8]))
+		}
 		newMt.arr[i] -= mFlat[i]
 	}
 
@@ -148,10 +168,16 @@ func (mt *matrix2[T]) MulHadamard(m Matrix[T]) (Matrix[T], error) {
 		return nil, ErrUnequalMat("2D matrix")
 	}
 
-	newMt := mt.clone()
-	mFlat := m.Flatten()
+	var (
+		newMt = mt.clone()
+		mFlat = m.Flatten()
+		n     = len(mt.arr)
+	)
 
-	for i := range newMt.arr {
+	for i := 0; i < n; i++ {
+		if i+8 < n {
+			prefetch(unsafe.Pointer(&mt.arr[i+8]))
+		}
 		newMt.arr[i] *= mFlat[i]
 	}
 

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/eterline/somedata"
+	somedata "github.com/eterline/somedata/ring_buffer"
 )
 
 func TestRingBuffer_AddAndGet(t *testing.T) {

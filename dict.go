@@ -1,43 +1,47 @@
 package somedata
 
-type vocabulary[T comparable] struct {
+/* dict - dictionary is a data structure that stores key–value pairs.
+It uses a hash function to map each key to an index in an internal array,
+enabling average O(1) time complexity for lookup, insertion, and deletion.
+*/
+type dict[T comparable] struct {
 	data map[T]struct{} // empty struct usage
 }
 
-// NewVocabulary - creates vocabulary
-func NewVocabulary[T comparable]() *vocabulary[T] {
-	return &vocabulary[T]{
+// NewDict - creates dict
+func NewDict[T comparable]() *dict[T] {
+	return &dict[T]{
 		data: make(map[T]struct{}),
 	}
 }
 
-func (v *vocabulary[T]) nilPanic() {
+func (v *dict[T]) nilPanic() {
 	if v == nil || v.data == nil {
-		panic("vocabulary: is nil pointer")
+		panic("dict: is nil pointer")
 	}
 }
 
-// Set - add element to vocabulary
-func (v *vocabulary[T]) Set(value T) {
+// Set - add element to dict
+func (v *dict[T]) Set(value T) {
 	v.nilPanic()
 	v.data[value] = struct{}{}
 }
 
-// Delete - delete element from vocabulary
-func (v *vocabulary[T]) Delete(value T) {
+// Delete - delete element from dict
+func (v *dict[T]) Delete(value T) {
 	v.nilPanic()
 	delete(v.data, value)
 }
 
-// Exists - check value exiting in vocabulary
-func (v *vocabulary[T]) Exists(value T) bool {
+// Exists - check value existing in dict
+func (v *dict[T]) Exists(value T) bool {
 	v.nilPanic()
 	_, ok := v.data[value]
 	return ok
 }
 
 // Intersects - returns intersection slice within two vocabularies
-func (v *vocabulary[T]) Intersects(voc *vocabulary[T]) (intersected []T, ok bool) {
+func (v *dict[T]) Intersects(voc *dict[T]) (intersected []T, ok bool) {
 	v.nilPanic()
 	slc := make([]T, 0)
 
@@ -55,7 +59,7 @@ func (v *vocabulary[T]) Intersects(voc *vocabulary[T]) (intersected []T, ok bool
 }
 
 // Slice - voc as a Slice
-func (v *vocabulary[T]) Slice() []T {
+func (v *dict[T]) Slice() []T {
 	v.nilPanic()
 	slc := make([]T, 0, len(v.data))
 	for value := range v.data {
@@ -64,14 +68,14 @@ func (v *vocabulary[T]) Slice() []T {
 	return slc
 }
 
-// Size - vocabulary elements count
-func (v *vocabulary[T]) Size() int {
+// Size - dict elements count
+func (v *dict[T]) Size() int {
 	v.nilPanic()
 	return len(v.data)
 }
 
 // Clear - fully clears all elements
-func (v *vocabulary[T]) Clear() {
+func (v *dict[T]) Clear() {
 	v.nilPanic()
 	for value := range v.data {
 		delete(v.data, value)

@@ -48,12 +48,11 @@ func (rb *slicesRingBuffer[T]) Add(value T) {
 	if rb.Full() {
 		rb.data[rb.head] = value
 		rb.head = (rb.head + 1) % rb.size
-		return
+	} else {
+		idx := (rb.head + rb.count) % rb.size
+		rb.data[idx] = value
+		rb.count++
 	}
-
-	idx := (rb.head + rb.count) % rb.size
-	rb.data[idx] = value
-	rb.count++
 }
 
 // Get - return element by index (0 - the oldest)

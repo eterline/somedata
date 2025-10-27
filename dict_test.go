@@ -6,8 +6,8 @@ import (
 	"github.com/eterline/somedata"
 )
 
-func TestVocabulary_SetExistsDelete(t *testing.T) {
-	v := somedata.NewVocabulary[string]()
+func TestDict_SetExistsDelete(t *testing.T) {
+	v := somedata.NewDict[string]()
 
 	v.Set("hello")
 	if !v.Exists("hello") {
@@ -24,10 +24,10 @@ func TestVocabulary_SetExistsDelete(t *testing.T) {
 	}
 }
 
-func TestVocabulary_SizeSliceClear(t *testing.T) {
-	v := somedata.NewVocabulary[int]()
+func TestDict_SizeSliceClear(t *testing.T) {
+	v := somedata.NewDict[int]()
 	if v.Size() != 0 {
-		t.Error("Size of empty vocabulary should be 0")
+		t.Error("Size of empty dict should be 0")
 	}
 
 	v.Set(1)
@@ -59,9 +59,9 @@ func TestVocabulary_SizeSliceClear(t *testing.T) {
 	}
 }
 
-func TestVocabulary_Intersects(t *testing.T) {
-	v1 := somedata.NewVocabulary[int]()
-	v2 := somedata.NewVocabulary[int]()
+func TestDict_Intersects(t *testing.T) {
+	v1 := somedata.NewDict[int]()
+	v2 := somedata.NewDict[int]()
 
 	slice, ok := v1.Intersects(v2)
 	if ok {
@@ -95,14 +95,14 @@ func TestVocabulary_Intersects(t *testing.T) {
 	}
 }
 
-func TestVocabulary_DeleteNonExisting(t *testing.T) {
-	v := somedata.NewVocabulary[int]()
+func TestDict_DeleteNonExisting(t *testing.T) {
+	v := somedata.NewDict[int]()
 	v.Delete(999)
 }
 
-func TestVocabulary_ExistsOnEmpty(t *testing.T) {
-	v := somedata.NewVocabulary[string]()
+func TestDict_ExistsOnEmpty(t *testing.T) {
+	v := somedata.NewDict[string]()
 	if v.Exists("nothing") {
-		t.Error("Exists should return false on empty vocabulary")
+		t.Error("Exists should return false on empty dict")
 	}
 }

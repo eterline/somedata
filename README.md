@@ -1,4 +1,3 @@
-
 # somedata
 
 Some data structures realizations in go

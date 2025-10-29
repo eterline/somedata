@@ -3,6 +3,9 @@ package somedata
 import (
 	"slices"
 	"unsafe"
+
+	"github.com/eterline/somedata"
+	"github.com/eterline/somedata/utils"
 )
 
 /*
@@ -23,7 +26,7 @@ type matrix2[T Numeric] struct {
 // NewMatrix2 - creates new 2D matrix
 func NewMatrix2[T Numeric](width, height int) Matrix[T] {
 	if width < 1 || height < 1 {
-		panic("2D matrix: width and height must be positive and non zero")
+		panic(somedata.ErrMatNegativeCoords(2))
 	}
 
 	return &matrix2[T]{
@@ -36,7 +39,7 @@ func NewMatrix2[T Numeric](width, height int) Matrix[T] {
 // index=y⋅width+x
 func (mt *matrix2[T]) coords2idx(w, h int) int {
 	if w >= mt.width || h >= mt.height {
-		panic("2D matrix: coords out of matrix range")
+		panic(somedata.ErrMatOutCoords(mt.Rank()))
 	}
 
 	return w*mt.width + h
@@ -60,7 +63,7 @@ func (mt *matrix2[T]) ShapeEquals(m Matrix[T]) bool {
 
 func (mt *matrix2[T]) Get(coords ...int) T {
 	if len(coords) != mt.Rank() {
-		panic("2D matrix: dimension coordinates mismatch")
+		panic(somedata.ErrMatDimCoordMismatch(mt.Rank()))
 	}
 
 	idx := mt.coords2idx(coords[0], coords[1])
@@ -69,7 +72,7 @@ func (mt *matrix2[T]) Get(coords ...int) T {
 
 func (mt *matrix2[T]) Set(value T, coords ...int) {
 	if len(coords) != mt.Rank() {
-		panic("2D matrix: dimension coordinates mismatch")
+		panic(somedata.ErrMatDimCoordMismatch(mt.Rank()))
 	}
 
 	idx := mt.coords2idx(coords[0], coords[1])
@@ -102,7 +105,7 @@ func (mt *matrix2[T]) Scale(k T) Matrix[T] {
 
 	for i := 0; i < n; i++ {
 		if i+8 < n {
-			prefetch(unsafe.Pointer(&mt.arr[i+8]))
+			utils.Prefetch(unsafe.Pointer(&mt.arr[i+8]))
 		}
 		cloned.arr[i] *= k
 	}
@@ -123,7 +126,7 @@ func (mt *matrix2[T]) Zero() {
 
 func (mt *matrix2[T]) Add(m Matrix[T]) (Matrix[T], error) {
 	if !mt.ShapeEquals(m) {
-		return nil, ErrUnequalMat("2D matrix")
+		return nil, somedata.ErrMatUnequalShapes(mt.Rank())
 	}
 
 	var (
@@ -134,7 +137,7 @@ func (mt *matrix2[T]) Add(m Matrix[T]) (Matrix[T], error) {
 
 	for i := 0; i < n; i++ {
 		if i+8 < n {
-			prefetch(unsafe.Pointer(&mt.arr[i+8]))
+			utils.Prefetch(unsafe.Pointer(&mt.arr[i+8]))
 		}
 		newMt.arr[i] += addMt[i]
 	}
@@ -144,7 +147,7 @@ func (mt *matrix2[T]) Add(m Matrix[T]) (Matrix[T], error) {
 
 func (mt *matrix2[T]) Sub(m Matrix[T]) (Matrix[T], error) {
 	if !mt.ShapeEquals(m) {
-		return nil, ErrUnequalMat("2D matrix")
+		return nil, somedata.ErrMatUnequalShapes(mt.Rank())
 	}
 
 	var (
@@ -155,7 +158,7 @@ func (mt *matrix2[T]) Sub(m Matrix[T]) (Matrix[T], error) {
 
 	for i := 0; i < n; i++ {
 		if i+8 < n {
-			prefetch(unsafe.Pointer(&mt.arr[i+8]))
+			utils.Prefetch(unsafe.Pointer(&mt.arr[i+8]))
 		}
 		newMt.arr[i] -= mFlat[i]
 	}
@@ -165,7 +168,7 @@ func (mt *matrix2[T]) Sub(m Matrix[T]) (Matrix[T], error) {
 
 func (mt *matrix2[T]) MulHadamard(m Matrix[T]) (Matrix[T], error) {
 	if !mt.ShapeEquals(m) {
-		return nil, ErrUnequalMat("2D matrix")
+		return nil, somedata.ErrMatUnequalShapes(mt.Rank())
 	}
 
 	var (
@@ -176,7 +179,7 @@ func (mt *matrix2[T]) MulHadamard(m Matrix[T]) (Matrix[T], error) {
 
 	for i := 0; i < n; i++ {
 		if i+8 < n {
-			prefetch(unsafe.Pointer(&mt.arr[i+8]))
+			utils.Prefetch(unsafe.Pointer(&mt.arr[i+8]))
 		}
 		newMt.arr[i] *= mFlat[i]
 	}

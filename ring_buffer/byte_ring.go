@@ -1,12 +1,8 @@
 package somedata
 
+import "github.com/eterline/somedata"
+
 // source code realization: https://github.com/komkom/ring
-
-import (
-	"fmt"
-)
-
-var ErrOverflow = fmt.Errorf(`overflow`)
 
 type byteRing struct {
 	buffer   []byte
@@ -17,6 +13,10 @@ type byteRing struct {
 
 // NewByteRing - creates io.ReadWriter byte buffer for stream usage
 func NewByteRing(size int) *byteRing {
+	if size < 1 {
+		panic(somedata.ErrRingBufferInvalidSize)
+	}
+
 	return &byteRing{
 		buffer: make([]byte, size),
 		size:   int64(size),
@@ -28,6 +28,7 @@ func (r *byteRing) Len() int {
 	if r.writePos < r.headPos {
 		return int(r.size - r.headPos + r.writePos)
 	}
+
 	return int(r.writePos - r.headPos)
 }
 
@@ -40,11 +41,11 @@ func (r *byteRing) Write(p []byte) (n int, err error) {
 	head := r.headPos
 
 	if wp < head && head-wp <= length {
-		return 0, ErrOverflow
+		return 0, somedata.ErrRingBufferOverflow
 	}
 
 	if wp >= head && head+r.size-wp <= length {
-		return 0, ErrOverflow
+		return 0, somedata.ErrRingBufferOverflow
 	}
 
 	if wp < head || r.size-wp >= length { // no split needed

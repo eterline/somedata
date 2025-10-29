@@ -5,8 +5,9 @@ package somedata
 // source code realization: https://github.com/gammazero/deque
 
 import (
-	"fmt"
 	"iter"
+
+	"github.com/eterline/somedata"
 )
 
 const dequeMinCapacity = 15
@@ -29,22 +30,14 @@ func NewDeque[T any]() *deque[T] {
 	return &deque[T]{}
 }
 
-func (q *deque[T]) nilPanic() {
-	if q == nil {
-		panic("double-ended queue: is nil pointer")
-	}
-}
-
 // Cap returns the current capacity of the Deque. If q is nil, q.Cap() is zero.
 func (q *deque[T]) Cap() int {
-	q.nilPanic()
 	return len(q.buf)
 }
 
 // Len returns the number of elements currently stored in the queue. If q is
 // nil, q.Len() returns zero.
 func (q *deque[T]) Len() int {
-	q.nilPanic()
 	return q.count
 }
 
@@ -75,7 +68,7 @@ func (q *deque[T]) PushFront(elem T) {
 // panics.
 func (q *deque[T]) PopFront() T {
 	if q.count <= 0 {
-		panic("deque: PopFront() called on empty queue")
+		panic(somedata.ErrDequeEmptyQueue("PopFront"))
 	}
 	ret := q.buf[q.head]
 	var zero T
@@ -116,7 +109,7 @@ func (q *deque[T]) IterPopFront() iter.Seq[T] {
 // panics.
 func (q *deque[T]) PopBack() T {
 	if q.count <= 0 {
-		panic("deque: PopBack() called on empty queue")
+		panic(somedata.ErrDequeEmptyQueue("PopBack"))
 	}
 
 	// Calculate new tail position
@@ -159,7 +152,7 @@ func (q *deque[T]) IterPopBack() iter.Seq[T] {
 // that would be returned by PopFront. This call panics if the queue is empty.
 func (q *deque[T]) Front() T {
 	if q.count <= 0 {
-		panic("deque: Front() called when empty")
+		panic(somedata.ErrDequeEmptyQueue("Front"))
 	}
 	return q.buf[q.head]
 }
@@ -168,7 +161,7 @@ func (q *deque[T]) Front() T {
 // would be returned by PopBack. This call panics if the queue is empty.
 func (q *deque[T]) Back() T {
 	if q.count <= 0 {
-		panic("deque: Back() called when empty")
+		panic(somedata.ErrDequeEmptyQueue("Front"))
 	}
 	return q.buf[q.prev(q.tail)]
 }
@@ -210,7 +203,7 @@ func (q *deque[T]) Iter() iter.Seq[T] {
 		head := origHead
 		for range q.Len() {
 			if q.head != origHead || q.tail != origTail {
-				panic("deque: modified during iteration")
+				panic(somedata.ErrDequeDuringIter)
 			}
 			if !yield(q.buf[head]) {
 				return
@@ -230,7 +223,7 @@ func (q *deque[T]) RIter() iter.Seq[T] {
 		tail := origTail
 		for range q.Len() {
 			if q.head != origHead || q.tail != origTail {
-				panic("deque: modified during iteration")
+				panic(somedata.ErrDequeDuringIter)
 			}
 			tail = q.prev(tail)
 			if !yield(q.buf[tail]) {
@@ -267,7 +260,7 @@ func (q *deque[T]) Clear() {
 // another allocation. If n is negative, Grow panics.
 func (q *deque[T]) Grow(n int) {
 	if n < 0 {
-		panic("deque.Grow: negative count")
+		panic(somedata.ErrDequeCalledNegCount("Grow"))
 	}
 	c := q.Cap()
 	l := q.Len()
@@ -465,7 +458,7 @@ func (q *deque[T]) Swap(idxA, idxB int) {
 
 func (q *deque[T]) checkRange(i int) {
 	if i < 0 || i >= q.count {
-		panic(fmt.Sprintf("deque: index out of range %d with length %d", i, q.Len()))
+		panic(somedata.ErrDequeOutOfRange(i, q.Len()))
 	}
 }
 

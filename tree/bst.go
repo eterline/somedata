@@ -1,14 +1,37 @@
 package somedata
 
-import "golang.org/x/exp/constraints"
+import (
+	"github.com/eterline/somedata"
+	"golang.org/x/exp/constraints"
+)
 
-type nodeBST[T constraints.Ordered] struct {
-	value T
-	low   *nodeBST[T]
-	hight *nodeBST[T]
+type NodeBST[T constraints.Ordered, D any] interface {
+	Value() T
+	Data() D
 }
 
-func (n *nodeBST[T]) rm(value T) (*nodeBST[T], bool) {
+type nodeBST[T constraints.Ordered, D any] struct {
+	value T
+	data  D
+	low   *nodeBST[T, D]
+	hight *nodeBST[T, D]
+}
+
+func (n *nodeBST[T, D]) Value() T {
+	if n == nil {
+		panic(somedata.ErrNilBstNode)
+	}
+	return n.value
+}
+
+func (n *nodeBST[T, D]) Data() D {
+	if n == nil {
+		panic(somedata.ErrNilBstNode)
+	}
+	return n.data
+}
+
+func (n *nodeBST[T, D]) rm(value T) (*nodeBST[T, D], bool) {
 	if n == nil {
 		return nil, false
 	}
@@ -41,14 +64,14 @@ func (n *nodeBST[T]) rm(value T) (*nodeBST[T], bool) {
 	return n, deleted
 }
 
-func (t *nodeBST[T]) min() T {
+func (t *nodeBST[T, D]) min() T {
 	if t.low == nil {
 		return t.value
 	}
 	return t.low.min()
 }
 
-func (n *nodeBST[T]) minNode() *nodeBST[T] {
+func (n *nodeBST[T, D]) minNode() *nodeBST[T, D] {
 	cur := n
 	for cur.low != nil {
 		cur = cur.low
@@ -56,59 +79,57 @@ func (n *nodeBST[T]) minNode() *nodeBST[T] {
 	return cur
 }
 
-func (t *nodeBST[T]) max() T {
+func (t *nodeBST[T, D]) max() T {
 	if t.hight == nil {
 		return t.value
 	}
 	return t.hight.max()
 }
 
-func (t *nodeBST[T]) inOrder(fn func(T)) {
-	if t.low != nil {
-		t.low.inOrder(fn)
+func (t *nodeBST[T, D]) inOrder(fn func(T)) {
+	if t == nil {
+		return
 	}
 
 	fn(t.value)
-
-	if t.hight != nil {
-		t.hight.inOrder(fn)
-	}
+	t.low.inOrder(fn)
+	t.hight.inOrder(fn)
 }
 
-func insertNode[T constraints.Ordered](node *nodeBST[T], value T) *nodeBST[T] {
+func insertNode[T constraints.Ordered, D any](node *nodeBST[T, D], value T, data D) *nodeBST[T, D] {
 	switch {
 	case node == nil:
-		return &nodeBST[T]{value: value}
+		return &nodeBST[T, D]{value: value, data: data}
 
 	case value < node.value:
-		node.low = insertNode(node.low, value)
+		node.low = insertNode(node.low, value, data)
 
 	case value > node.value:
-		node.hight = insertNode(node.hight, value)
+		node.hight = insertNode(node.hight, value, data)
 	}
 
 	return node
 }
 
-type threeBST[T constraints.Ordered] struct {
+type threeBST[T constraints.Ordered, D any] struct {
 	size int
-	root *nodeBST[T]
+	root *nodeBST[T, D]
 }
 
-func NewThreeBST[T constraints.Ordered]() *threeBST[T] {
-	return &threeBST[T]{}
+func NewThreeBST[T constraints.Ordered, D any]() *threeBST[T, D] {
+	return &threeBST[T, D]{}
 }
 
-func (t *threeBST[T]) Size() int {
+func (t *threeBST[T, D]) Size() int {
 	return t.size
 }
 
-func (t *threeBST[T]) Insert(value T) {
-	t.root = insertNode(t.root, value)
+func (t *threeBST[T, D]) Insert(value T, data D) {
+	t.root = insertNode(t.root, value, data)
 	t.size++
 }
 
-func (t *threeBST[T]) Min() (T, bool) {
+func (t *threeBST[T, D]) Min() (T, bool) {
 	if t.size == 0 {
 		var zero T
 		return zero, false
@@ -116,7 +137,7 @@ func (t *threeBST[T]) Min() (T, bool) {
 	return t.root.min(), true
 }
 
-func (t *threeBST[T]) Max() (T, bool) {
+func (t *threeBST[T, D]) Max() (T, bool) {
 	if t.size == 0 {
 		var zero T
 		return zero, false
@@ -124,14 +145,14 @@ func (t *threeBST[T]) Max() (T, bool) {
 	return t.root.max(), true
 }
 
-func (t *threeBST[T]) InOrder(fn func(T)) {
+func (t *threeBST[T, D]) InOrder(fn func(T)) {
 	if t.size == 0 {
 		return
 	}
 	t.root.inOrder(fn)
 }
 
-func (t *threeBST[T]) Delete(value T) (ok bool) {
+func (t *threeBST[T, D]) Delete(value T) (ok bool) {
 	if t.size == 0 {
 		return false
 	}
@@ -140,5 +161,6 @@ func (t *threeBST[T]) Delete(value T) (ok bool) {
 	if ok {
 		t.size--
 	}
+
 	return ok
 }

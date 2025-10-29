@@ -2,40 +2,39 @@ package somedata_test
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 
 	somedata "github.com/eterline/somedata/tree"
 )
 
 func TestThreeBST_InsertAndInOrder(t *testing.T) {
-	tree := somedata.NewThreeBST[int]()
+	tree := somedata.NewThreeBST[int, any]()
 
 	values := []int{50, 30, 70, 20, 40, 60, 80}
 	for _, v := range values {
-		tree.Insert(v)
+		tree.Insert(v, strconv.Itoa(v))
 	}
 
-	// Проверка размера
 	if tree.Size() != len(values) {
 		t.Fatalf("expected size %d, got %d", len(values), tree.Size())
 	}
 
-	// Проверка inOrder (должен вернуть отсортированный массив)
 	got := []int{}
 	tree.InOrder(func(v int) { got = append(got, v) })
 
-	expected := []int{50, 30, 20, 40, 70, 60, 80} // по твоей реализации inOrder выводит root-left-right
+	expected := []int{50, 30, 20, 40, 70, 60, 80}
 	if !reflect.DeepEqual(got, expected) {
 		t.Fatalf("inOrder: expected %v, got %v", expected, got)
 	}
 }
 
 func TestThreeBST_MinMax(t *testing.T) {
-	tree := somedata.NewThreeBST[int]()
+	tree := somedata.NewThreeBST[int, any]()
 
 	values := []int{50, 30, 70, 20, 40, 60, 80}
 	for _, v := range values {
-		tree.Insert(v)
+		tree.Insert(v, strconv.Itoa(v))
 	}
 
 	min, ok := tree.Min()
@@ -50,11 +49,11 @@ func TestThreeBST_MinMax(t *testing.T) {
 }
 
 func TestThreeBST_Delete(t *testing.T) {
-	tree := somedata.NewThreeBST[int]()
+	tree := somedata.NewThreeBST[int, any]()
 
 	values := []int{50, 30, 70, 20, 40, 60, 80}
 	for _, v := range values {
-		tree.Insert(v)
+		tree.Insert(v, strconv.Itoa(v))
 	}
 
 	deletes := []int{20, 70, 50}
@@ -79,9 +78,9 @@ func TestThreeBST_Delete(t *testing.T) {
 }
 
 func TestThreeBST_DeleteNonExistent(t *testing.T) {
-	tree := somedata.NewThreeBST[int]()
-	tree.Insert(10)
-	tree.Insert(20)
+	tree := somedata.NewThreeBST[int, any]()
+	tree.Insert(10, "hello")
+	tree.Insert(20, "there")
 
 	ok := tree.Delete(99)
 	if ok {

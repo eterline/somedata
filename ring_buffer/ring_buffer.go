@@ -1,6 +1,13 @@
 package somedata
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/eterline/somedata"
+	"github.com/eterline/somedata/utils"
+)
+
+const RingBufferReallocThreshold = 8192 // 8KB of buffer data
 
 /*
 RingBuffer - fixed-size data structure that uses a
@@ -39,7 +46,7 @@ type slicesRingBuffer[T comparable] struct {
 
 func NewRingBuffer[T comparable](size int) RingBuffer[T] {
 	if size < 1 {
-		panic("ring buffer: size must be above 0")
+		panic(somedata.ErrRingBufferInvalidSize)
 	}
 
 	return &slicesRingBuffer[T]{
@@ -105,10 +112,14 @@ func (rb *slicesRingBuffer[T]) Full() bool {
 
 // Clear - clear all buffer
 func (rb *slicesRingBuffer[T]) Clear() {
-	for i := 0; i < rb.count; i++ {
-		idx := (rb.head + i) % rb.size
-		var dflt T
-		rb.data[idx] = dflt
+	if utils.SizeofMul[T](rb.size) <= RingBufferReallocThreshold {
+		for i := 0; i < rb.count; i++ {
+			idx := (rb.head + i) % rb.size
+			var dflt T
+			rb.data[idx] = dflt
+		}
+	} else {
+		rb.data = make([]T, rb.size)
 	}
 	rb.count = 0
 	rb.head = 0
@@ -150,7 +161,7 @@ type syncSlicesRingBuffer[T comparable] struct {
 // NewSyncRingBuffer - create ring buffer with multithreading save implementation
 func NewSyncRingBuffer[T comparable](size int) RingBuffer[T] {
 	if size < 1 {
-		panic("ring buffer: size must be above 0")
+		panic(somedata.ErrRingBufferInvalidSize)
 	}
 
 	return &syncSlicesRingBuffer[T]{

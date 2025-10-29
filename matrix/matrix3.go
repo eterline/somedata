@@ -1,6 +1,10 @@
 package somedata
 
-import "slices"
+import (
+	"slices"
+
+	"github.com/eterline/somedata"
+)
 
 // matrix3 - 3D matrix
 type matrix3[T Numeric] struct {
@@ -13,7 +17,7 @@ type matrix3[T Numeric] struct {
 // NewMatrix3 - creates new 3D matrix
 func NewMatrix3[T Numeric](width, height, deep int) *matrix3[T] {
 	if width < 1 || height < 1 || deep < 1 {
-		panic("3D matrix: width, height, deep - must be positive and non zero")
+		panic(somedata.ErrMatNegativeCoords(3))
 	}
 
 	return &matrix3[T]{
@@ -27,7 +31,7 @@ func NewMatrix3[T Numeric](width, height, deep int) *matrix3[T] {
 // index = (z*height+y)*width+x
 func (mt *matrix3[T]) coords2idx(width, height, deep int) int {
 	if width >= mt.width || height >= mt.height || deep >= mt.deep {
-		panic("3D matrix: coords out of matrix range")
+		panic(somedata.ErrMatOutCoords(mt.Rank()))
 	}
 
 	return (deep*mt.height+height)*mt.width + width
@@ -51,7 +55,7 @@ func (mt *matrix3[T]) ShapeEquals(m Matrix[T]) bool {
 
 func (mt *matrix3[T]) Get(coords ...int) T {
 	if len(coords) != mt.Rank() {
-		panic("3D matrix: dimension coordinates mismatch")
+		panic(somedata.ErrMatDimCoordMismatch(mt.Rank()))
 	}
 
 	idx := mt.coords2idx(coords[0], coords[1], coords[2])
@@ -60,7 +64,7 @@ func (mt *matrix3[T]) Get(coords ...int) T {
 
 func (mt *matrix3[T]) Set(value T, coords ...int) {
 	if len(coords) != mt.Rank() {
-		panic("3D matrix: dimension coordinates mismatch")
+		panic(somedata.ErrMatDimCoordMismatch(mt.Rank()))
 	}
 
 	idx := mt.coords2idx(coords[0], coords[1], coords[2])
@@ -110,7 +114,7 @@ func (mt *matrix3[T]) Zero() {
 
 func (mt *matrix3[T]) Add(m Matrix[T]) (Matrix[T], error) {
 	if !mt.ShapeEquals(m) {
-		return nil, ErrUnequalMat("3D matrix")
+		return nil, somedata.ErrMatUnequalShapes(mt.Rank())
 	}
 
 	newMt := mt.clone()
@@ -125,7 +129,7 @@ func (mt *matrix3[T]) Add(m Matrix[T]) (Matrix[T], error) {
 
 func (mt *matrix3[T]) Sub(m Matrix[T]) (Matrix[T], error) {
 	if !mt.ShapeEquals(m) {
-		return nil, ErrUnequalMat("3D matrix")
+		return nil, somedata.ErrMatUnequalShapes(mt.Rank())
 	}
 
 	newMt := mt.clone()
@@ -140,7 +144,7 @@ func (mt *matrix3[T]) Sub(m Matrix[T]) (Matrix[T], error) {
 
 func (mt *matrix3[T]) MulHadamard(m Matrix[T]) (Matrix[T], error) {
 	if !mt.ShapeEquals(m) {
-		return nil, ErrUnequalMat("3D matrix")
+		return nil, somedata.ErrMatUnequalShapes(mt.Rank())
 	}
 
 	newMt := mt.clone()

@@ -1,14 +1,8 @@
 package somedata
 
 import (
-	"fmt"
-
 	"golang.org/x/exp/constraints"
 )
-
-func ErrUnequalMat(s string) error {
-	return fmt.Errorf("%s: not equal matrix shapes", s)
-}
 
 type Numeric interface {
 	constraints.Integer | constraints.Float

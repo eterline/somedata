@@ -1,8 +1,8 @@
-// +build amd64,windows
+//go:build amd64
 
 #include "textflag.h"
 
-TEXT ·prefetch(SB), NOSPLIT, $0
+TEXT ·Prefetch(SB), NOSPLIT, $0
     MOVQ addr+0(FP), AX
     PREFETCHT0 (AX)
     RET

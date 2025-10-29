@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/bmizerany/assert"
+	somedataerr "github.com/eterline/somedata"
 	somedata "github.com/eterline/somedata/ring_buffer"
 	"github.com/stretchr/testify/require"
 )
@@ -48,7 +49,7 @@ func TestRing_sequential(t *testing.T) {
 		{
 			ringSize:  11,
 			writeSize: 70,
-			errWrite:  somedata.ErrOverflow,
+			errWrite:  somedataerr.ErrRingBufferOverflow,
 			readSize:  5,
 			loops:     100,
 		},
@@ -71,7 +72,7 @@ func TestRing_sequential(t *testing.T) {
 			length := r.Len()
 
 			diff, err := r.Write([]byte(seq))
-			if errors.Is(err, somedata.ErrOverflow) {
+			if errors.Is(err, somedataerr.ErrRingBufferOverflow) {
 
 				for {
 					n, err := r.Read(readSlice)

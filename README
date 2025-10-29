@@ -1,0 +1,30 @@
+
+# somedata
+
+Some data structures realizations in go
+
+
+## Types
+
+### Linear
+- Deque - double-ended queue: tested ✅
+- Dict - dictionary based on hash map tables from GO: tested ✅
+- Disjoint Set - djointset: tested ✅
+- Linked list: in process 🚩
+
+### Matrix (flat slice realization)
+- 2D matrix: tested ✅
+- 3D matrix: tested ✅
+- Multi dimensional matrix: in process 🚩
+
+### Ring buffer
+- Byte ring buffer (impements: io.ReadWriter): tested ✅
+- Ring buffer: tested ✅ (zero allocations in static size types)
+
+### Tree
+- BST - searching tree: tested ✅
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
